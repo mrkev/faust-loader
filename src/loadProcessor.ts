@@ -1,5 +1,4 @@
-import { IAudioContext } from "standardized-audio-context";
-import getClass from "./FaustAudioProcessorNode";
+import { FaustAudioProcessorNode } from "./FaustAudioProcessorNode";
 
 function heap2Str(buf: Uint8Array) {
   let str = "";
@@ -11,7 +10,8 @@ function heap2Str(buf: Uint8Array) {
 }
 
 const processorModules: Record<string, Promise<void>> = {};
-async function loadProcessorModule(context: IAudioContext, url: string) {
+async function loadProcessorModule(context: BaseAudioContext, url: string) {
+  console.log("HERE");
   if (!context.audioWorklet) {
     console.error(
       "Error loading FaustAudioProcessorNode: standardized-audio-context AudioWorklet isn't supported in this environment."
@@ -108,7 +108,7 @@ const importObject = {
 };
 
 export default async function loadProcessor(
-  context: IAudioContext,
+  context: BaseAudioContext,
   name: string,
   baseURL: string
 ) {
@@ -121,7 +121,7 @@ export default async function loadProcessor(
 
   const dspInstance = await WebAssembly.instantiate(dspModule, importObject);
 
-  const HEAPU8 = new Uint8Array(dspInstance.exports.memory.buffer);
+  const HEAPU8 = new Uint8Array((dspInstance.exports.memory as any).buffer);
   const json = heap2Str(HEAPU8);
   const json_object = JSON.parse(json);
   const processorOptions = { wasm_module: dspModule, json: json };
@@ -136,7 +136,6 @@ export default async function loadProcessor(
     processorOptions,
   };
 
-  const FaustAudioProcessorNode = getClass();
   if (!FaustAudioProcessorNode) {
     console.error(
       "Error loading FaustAudioProcessorNode: Web audio API isn't supported in this environment."
@@ -153,7 +152,7 @@ export default async function loadProcessor(
     return node;
   } catch (e) {
     console.error(
-      "FaustAudioProcessorNode initialization failed: make sure you are passing a standardized-audio-context AudioContext."
+      "AA FaustAudioProcessorNode initialization failed: make sure you are passing a standardized-audio-context AudioContext."
     );
     console.error(e);
   }
