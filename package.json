@@ -4,12 +4,18 @@
   "main": "dist/faustLoader.js",
   "types": "dist/faustLoader.d.ts",
   "scripts": {
-    "prepare": "install-peers",
+    "prepare": "install-peers && tsc",
     "build": "tsc",
     "serve": "webpack serve -c test/webpack.config.js",
     "test": "webpack build -c test/webpack.config.js"
   },
-  "keywords": ["webpack", "loader", "faust", "audio", "dsp"],
+  "keywords": [
+    "webpack",
+    "loader",
+    "faust",
+    "audio",
+    "dsp"
+  ],
   "author": "Mason Bourgeois",
   "license": "ISC",
   "description": "Webpack loader for Faust .dsp files",
