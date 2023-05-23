@@ -30,7 +30,7 @@ export type ProcessorLoader = (
 const faustLoader: LoaderDefinitionFunction<Options> = async function (
   content
 ) {
-  const options: Options = getOptions(this);
+  const options: Options = this.getOptions();
   const { outputPath = "", publicPath = "/" } = options;
   const context = this.rootContext;
   const workDir = await tmp.dir();
@@ -61,7 +61,7 @@ const faustLoader: LoaderDefinitionFunction<Options> = async function (
   const wasmContent = await fs.readFile(wasmPath);
   // TODO: this method should accept a buffer
   // PR: https://github.com/webpack/webpack/pull/13577
-  this.emitFile(path.join(outputPath, wasmName), wasmContent);
+  this.emitFile(path.join(outputPath, wasmName), wasmContent as any);
 
   const processorName = interpolateName(this, "[name]-processor.js", {
     context,
@@ -88,7 +88,8 @@ const faustLoader: LoaderDefinitionFunction<Options> = async function (
   });
 
   return `
-  import loadProcessor from "${importPath}";
+  // import loadProcessor from "${importPath}";
+  import loadProcessor from "faust-loader/dist/loadProcessor";
 
   function create${dspName}Node(context) {
     return loadProcessor(context, "${dspName}", "${publicPath}")
